@@ -1,0 +1,1218 @@
+/* ===================================================================
+   SUDOKU & KENKEN ARENA - CLASSIC TOURNAMENT EDITION DESIGN SYSTEM
+   =================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
+
+:root {
+  /* Classic Editorial & Archival Parchment Palette */
+  --bg-desk: #ece6dc;
+  --bg-core: #fcfaf7;
+  --bg-gradient: linear-gradient(180deg, #fcfaf6 0%, #f7f3eb 100%);
+  
+  --ink-primary: #181615;
+  --ink-secondary: #494541;
+  --ink-muted: #78716c;
+  --ink-pen: #1e3a8a;        /* Classic fountain pen blue for player inputs */
+  
+  --kenken-classic: #881337;   /* Vintage crimson / burgundy */
+  --sudoku-classic: #1e3a8a;   /* Classic Oxford / Prussian navy */
+  --accent-gold: #b45309;      /* Antique gold / brass */
+  --emerald-classic: #166534;  /* Deep British racing green / forest green */
+  --red-classic: #991b1b;
+  
+  --border-classic: #dcd5c9;
+  --border-dark: #181615;
+  
+  --cell-bg: #ffffff;
+  --cell-selected: #fef3c7;    /* Warm parchment gold */
+  --cell-highlight: #faf6ee;   /* Subtle axis highlight */
+  --cell-conflict: #fee2e2;
+  
+  --font-title: 'Playfair Display', Georgia, serif;
+  --font-classic: 'Cinzel', serif;
+  --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --font-mono: 'Space Grotesk', 'Lora', monospace;
+  
+  --phone-width: 412px;
+  --phone-height: 860px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+input, textarea, button {
+  user-select: auto;
+}
+
+button {
+  cursor: pointer;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-desk);
+  background-image: radial-gradient(circle at 50% 25%, #f4f0e8 0%, #e5dfd4 100%);
+  color: var(--ink-primary);
+  font-family: var(--font-display);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Background warm ambient vignette */
+.bg-ambient {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.4) 0%, rgba(220, 213, 201, 0.6) 100%);
+}
+
+.ambient-orb {
+  display: none;
+}
+
+/* ===================================================================
+   DESKTOP BEZEL / MOBILE VIEWPORT CONTAINER (CLASSIC ARCHIVAL BINDING)
+   =================================================================== */
+.mobile-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: var(--phone-width);
+  height: 100%;
+  max-height: var(--phone-height);
+  background: var(--bg-core);
+  background-image: var(--bg-gradient);
+  border-radius: 36px;
+  box-shadow: 
+    0 0 0 8px #e2dcd2, 
+    0 0 0 10px #cfc7b8, 
+    0 25px 60px rgba(44, 40, 37, 0.18), 
+    0 4px 12px rgba(44, 40, 37, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Subtle Mobile Speaker / Notch */
+.phone-notch {
+  width: 120px;
+  height: 20px;
+  background: #ded8cb;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  z-index: 100;
+}
+
+.speaker {
+  width: 42px;
+  height: 3.5px;
+  background: #9c9486;
+  border-radius: 2px;
+}
+
+.camera-lens {
+  width: 7px;
+  height: 7px;
+  background: #6e675b;
+  border: 1px solid #9c9486;
+  border-radius: 50%;
+}
+
+/* Native Mobile overrides */
+@media (max-width: 480px), (max-height: 890px) {
+  .mobile-wrapper {
+    max-width: 100vw;
+    max-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+  .phone-notch {
+    display: none;
+  }
+}
+
+/* Screen views system */
+.screen-view {
+  position: absolute;
+  inset: 0;
+  display: none !important;
+  flex-direction: column;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transform: translateY(12px) scale(0.99);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.screen-view::-webkit-scrollbar {
+  display: none;
+}
+
+.screen-view.active {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+/* ===================================================================
+   ENTRY SCREEN (CLASSIC CHAMPIONSHIP)
+   =================================================================== */
+#entry-screen {
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  padding: 36px 24px 20px 24px;
+}
+
+.entry-brand {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: rgba(180, 83, 9, 0.07);
+  border: 1px solid rgba(180, 83, 9, 0.25);
+  border-radius: 999px;
+  font-family: var(--font-classic);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+}
+
+.classic-diamond {
+  font-size: 8px;
+  color: var(--accent-gold);
+}
+
+.entry-title {
+  font-family: var(--font-title);
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: 0.5px;
+  color: var(--ink-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.entry-title .ampersand {
+  font-family: var(--font-title);
+  font-style: italic;
+  font-weight: 600;
+  color: var(--kenken-classic);
+  font-size: 36px;
+}
+
+.classic-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 4px;
+  width: 100%;
+  max-width: 180px;
+}
+
+.classic-ornament .line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c7bfb0, transparent);
+}
+
+.classic-ornament .ornament-symbol {
+  font-size: 14px;
+  color: var(--accent-gold);
+  line-height: 1;
+}
+
+/* Dual-Cards Classic Showcase */
+.entry-art-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 18px 0;
+}
+
+.art-card {
+  width: 124px;
+  height: 144px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1.5px solid var(--border-classic);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 6px 18px rgba(44, 40, 37, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.art-card.kenken {
+  border-color: rgba(136, 19, 55, 0.28);
+  box-shadow: 0 8px 20px rgba(136, 19, 55, 0.08);
+}
+
+.art-card.sudoku {
+  border-color: rgba(30, 58, 138, 0.28);
+  box-shadow: 0 8px 20px rgba(30, 58, 138, 0.08);
+}
+
+.art-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(44, 40, 37, 0.1);
+}
+
+.kenken-entry-img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.classic-sudoku-icon {
+  width: 54px;
+  height: 54px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.06));
+}
+
+.art-label {
+  font-family: var(--font-classic);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.art-label.kenken-text {
+  color: var(--kenken-classic);
+}
+
+.art-label.sudoku-text {
+  color: var(--sudoku-classic);
+}
+
+/* Play Button - Classic Prestigious Pass */
+.play-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.btn-play {
+  position: relative;
+  width: 230px;
+  height: 60px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  cursor: pointer;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #fffdfa;
+  font-family: var(--font-classic);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.25s ease;
+  overflow: hidden;
+  z-index: 25;
+  pointer-events: auto !important;
+}
+
+.btn-play:hover, .btn-play:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.3);
+  border-color: rgba(212, 175, 55, 0.8);
+}
+
+.btn-play:active {
+  transform: translateY(1px);
+}
+
+.teams-count-pill {
+  font-size: 12px;
+  color: var(--ink-secondary);
+  font-family: var(--font-classic);
+  letter-spacing: 1px;
+  padding: 6px 16px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid var(--border-classic);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.teams-count-pill span {
+  color: var(--kenken-classic);
+  font-weight: 800;
+  font-family: var(--font-mono);
+}
+
+/* Three dots at bottom-left */
+.entry-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px 10px 10px 10px;
+}
+
+.admin-three-dots {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 10px;
+  opacity: 0.35;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.3s ease, background 0.3s ease;
+  z-index: 30;
+  pointer-events: auto !important;
+}
+
+.admin-three-dots span {
+  width: 5px;
+  height: 5px;
+  background-color: var(--ink-muted);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.admin-three-dots:hover, .admin-three-dots:focus {
+  opacity: 0.95;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.admin-three-dots:hover span, .admin-three-dots:focus span {
+  background-color: var(--ink-primary);
+}
+
+/* ===================================================================
+   VIEW 2: ROULETTE / SELECTION ANIMATION (CLASSIC PUZZLE DRAW)
+   =================================================================== */
+#roulette-screen {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+  padding: 30px 20px;
+}
+
+.roulette-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-alloc-badge {
+  font-family: var(--font-classic);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 5px 16px;
+  border-radius: 20px;
+  background: rgba(180, 83, 9, 0.08);
+  border: 1px solid rgba(180, 83, 9, 0.3);
+  color: var(--accent-gold);
+}
+
+.roulette-title {
+  font-family: var(--font-title);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink-primary);
+  letter-spacing: 0.5px;
+}
+
+.slot-machine-box {
+  width: 250px;
+  height: 100px;
+  background: #ffffff;
+  border: 2px solid var(--ink-primary);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(44, 40, 37, 0.1), inset 0 2px 6px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slot-reel {
+  display: flex;
+  flex-direction: column;
+  transition: transform 3.5s cubic-bezier(0.12, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+.slot-item {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: var(--font-classic);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.slot-item.kenken {
+  color: var(--kenken-classic);
+}
+
+.slot-item.sudoku {
+  color: var(--sudoku-classic);
+}
+
+.roulette-status {
+  font-family: var(--font-title);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+
+/* ===================================================================
+   VIEW 3: GAMEPLAY ARENA SCREEN (CLASSIC PRINT EDITION)
+   =================================================================== */
+#game-screen {
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-classic);
+}
+
+.team-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid var(--border-classic);
+  border-radius: 999px;
+  font-family: var(--font-classic);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--ink-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.team-pill .pulsing-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--emerald-classic);
+  border-radius: 50%;
+}
+
+.game-timer-pill {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid var(--border-classic);
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.game-type-badge {
+  font-family: var(--font-classic);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.game-type-badge.kenken {
+  background: rgba(136, 19, 55, 0.08);
+  border: 1px solid rgba(136, 19, 55, 0.28);
+  color: var(--kenken-classic);
+}
+
+.game-type-badge.sudoku {
+  background: rgba(30, 58, 138, 0.08);
+  border: 1px solid rgba(30, 58, 138, 0.28);
+  color: var(--sudoku-classic);
+}
+
+.sub-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.puzzle-title-label {
+  font-family: var(--font-title);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+/* ===================================================================
+   CLASSIC PUZZLE GRID BOARD
+   =================================================================== */
+.board-container {
+  width: 100%;
+  max-width: 350px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 3px solid var(--border-dark);
+  border-radius: 8px;
+  display: grid;
+  padding: 2px;
+  gap: 0;
+  box-shadow: 0 8px 24px rgba(44, 40, 37, 0.1);
+  box-sizing: border-box;
+}
+
+.board-container.grid-4x4 {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.board-container.grid-6x6 {
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+}
+
+.grid-cell {
+  position: relative;
+  background: var(--cell-bg);
+  border: 1px solid #ded8cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  user-select: none;
+}
+
+.grid-4x4 .grid-cell {
+  font-size: 28px;
+}
+
+.grid-6x6 .grid-cell {
+  font-size: 20px;
+}
+
+.grid-cell:active {
+  transform: scale(0.97);
+}
+
+/* Cell states */
+.grid-cell.selected {
+  background: var(--cell-selected) !important;
+  box-shadow: inset 0 0 0 2px var(--accent-gold);
+}
+
+.grid-cell.highlight-axis {
+  background: var(--cell-highlight);
+}
+
+.grid-cell.given {
+  color: #000000;
+  font-weight: 800;
+  background: #fbf9f5;
+}
+
+.grid-cell.user-filled {
+  color: var(--ink-pen);
+  font-weight: 700;
+}
+
+.grid-cell.revealed-cell {
+  color: var(--emerald-classic) !important;
+  background: #f0fdf4 !important;
+}
+
+.grid-cell.conflict {
+  background: var(--cell-conflict) !important;
+  color: var(--red-classic) !important;
+  animation: shakeCell 0.35s;
+}
+
+@keyframes shakeCell {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  70% { transform: translateX(3px); }
+}
+
+/* KenKen Cage Label in top-left */
+.cage-label {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ink-primary);
+  pointer-events: none;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  z-index: 5;
+}
+
+/* Sudoku 2x3 Box Partitions */
+.grid-6x6 .cell-col-2 {
+  border-right: 3px solid var(--border-dark) !important;
+}
+
+.grid-6x6 .cell-row-1, .grid-6x6 .cell-row-3 {
+  border-bottom: 3px solid var(--border-dark) !important;
+}
+
+/* KenKen Bold Cage Outlines */
+.cage-border-top {
+  border-top: 3.5px solid var(--border-dark) !important;
+}
+.cage-border-bottom {
+  border-bottom: 3.5px solid var(--border-dark) !important;
+}
+.cage-border-left {
+  border-left: 3.5px solid var(--border-dark) !important;
+}
+.cage-border-right {
+  border-right: 3.5px solid var(--border-dark) !important;
+}
+
+/* ===================================================================
+   ON-SCREEN MOBILE KEYPAD (CLASSIC TYPEWRITER / BEVELED TILES)
+   =================================================================== */
+.keypad-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+.keypad-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.keypad-btn {
+  flex: 1;
+  height: 50px;
+  background: #ffffff;
+  border: 1px solid #d5cec0;
+  border-bottom: 3px solid #c7bfb0;
+  border-radius: 12px;
+  color: var(--ink-primary);
+  font-family: var(--font-title);
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(44, 40, 37, 0.05);
+  transition: all 0.12s ease;
+}
+
+.keypad-btn:active {
+  transform: translateY(2px);
+  border-bottom: 1px solid #c7bfb0;
+  background: #fdfaf3;
+}
+
+.keypad-btn.action-btn {
+  font-size: 13px;
+  font-family: var(--font-classic);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: #f7f3ec;
+  color: var(--ink-secondary);
+  border-color: #dcd5c9;
+  border-bottom: 3px solid #cfc7b9;
+}
+
+.keypad-btn.action-btn.erase:active {
+  background: var(--red-classic);
+  color: #ffffff;
+}
+
+.btn-check-solution {
+  height: 50px;
+  flex: 1.2;
+  background: linear-gradient(135deg, #166534 0%, #14532d 100%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-bottom: 3px solid #0f3d20;
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: var(--font-classic);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.25);
+  transition: all 0.15s ease;
+}
+
+.btn-check-solution:active {
+  transform: translateY(2px);
+  border-bottom: 1px solid #0f3d20;
+}
+
+/* ===================================================================
+   ADMIN DASHBOARD SCREEN (CLASSIC TOURNAMENT DESK)
+   =================================================================== */
+#admin-screen {
+  padding: 16px 14px;
+  gap: 14px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-classic);
+  padding-bottom: 10px;
+}
+
+.admin-title-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-title {
+  font-size: 16px;
+  font-family: var(--font-classic);
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--ink-primary);
+}
+
+.admin-subtitle {
+  font-size: 11px;
+  font-family: var(--font-title);
+  font-style: italic;
+  color: var(--ink-muted);
+}
+
+.admin-controls-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-admin-exit {
+  background: #ffffff;
+  border: 1px solid var(--border-classic);
+  color: var(--ink-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: var(--font-classic);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.admin-teams-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: calc(100% - 120px);
+  padding-right: 4px;
+}
+
+.admin-team-card {
+  background: #ffffff;
+  border: 1px solid var(--border-classic);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  box-shadow: 0 3px 10px rgba(44, 40, 37, 0.05);
+}
+
+.admin-team-card.occupied {
+  border-color: rgba(30, 58, 138, 0.35);
+}
+
+.admin-team-card.empty {
+  opacity: 0.65;
+  border-style: dashed;
+}
+
+.admin-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-team-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-team-name {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-classic);
+  color: var(--ink-primary);
+}
+
+.admin-game-meta {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f7f3ec;
+  color: var(--sudoku-classic);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.admin-board-preview-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-mini-board {
+  width: 86px;
+  height: 86px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-dark);
+  display: grid;
+  padding: 1px;
+  gap: 1px;
+}
+
+.admin-mini-board.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.admin-mini-board.grid-6 {
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+}
+
+.admin-mini-cell {
+  background: #faf8f5;
+  border: 0.5px solid #ded8cc;
+  border-radius: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+}
+
+.admin-mini-cell.filled {
+  color: var(--sudoku-classic);
+  background: #e0e7ff;
+}
+
+.admin-actions-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-reveal-answer {
+  background: linear-gradient(135deg, #b45309, #92400e);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 11px;
+  font-family: var(--font-classic);
+  font-weight: 700;
+  padding: 7px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: 0 2px 8px rgba(180, 83, 9, 0.2);
+  transition: all 0.2s;
+}
+
+.btn-reveal-answer.revealed {
+  background: var(--emerald-classic);
+  color: #ffffff;
+  cursor: default;
+}
+
+.admin-reset-bar {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.btn-reset-whole-game {
+  width: 100%;
+  height: 46px;
+  background: linear-gradient(135deg, #991b1b, #7f1d1d);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-family: var(--font-classic);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(153, 27, 27, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-reset-whole-game:active {
+  transform: translateY(1px);
+}
+
+/* ===================================================================
+   FLOATING IN-APP TOAST
+   =================================================================== */
+.arena-toast {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #181615;
+  color: #ffffff;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-family: var(--font-classic);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.arena-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===================================================================
+   MODALS SYSTEM (CLASSIC STATIONERY CARDS)
+   =================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(24, 22, 21, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-backdrop.show {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 350px;
+  background: #ffffff;
+  border: 1.5px solid var(--border-classic);
+  border-radius: 20px;
+  padding: 26px 22px;
+  box-shadow: 0 16px 40px rgba(24, 22, 21, 0.18);
+  transform: translateY(14px) scale(0.98);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  color: var(--ink-primary);
+}
+
+.modal-backdrop.show .modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #f7f3ec;
+  border: none;
+  color: var(--ink-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.modal-title {
+  font-family: var(--font-title);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink-primary);
+}
+
+.modal-desc {
+  font-size: 13px;
+  color: var(--ink-secondary);
+  line-height: 1.45;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.form-label {
+  font-family: var(--font-classic);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+}
+
+.form-input {
+  width: 100%;
+  height: 48px;
+  background: #faf8f5;
+  border: 1.5px solid var(--border-classic);
+  border-radius: 10px;
+  padding: 0 14px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--ink-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--ink-primary);
+  background: #ffffff;
+}
+
+.btn-submit {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  color: #fffdfa;
+  font-family: var(--font-classic);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-submit:active {
+  transform: translateY(1px);
+}
+
+/* Celebration modal */
+.celebrate-card {
+  text-align: center;
+  align-items: center;
+}
+
+.trophy-glow {
+  font-size: 48px;
+}
+
+.confetti-canvas {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}

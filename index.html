@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Sudoku & KenKen Arena | Round 3</title>
+  <meta name="description" content="Mobile-exclusive animated Sudoku and KenKen arena competition powered by Firebase Realtime Database">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Ambient Glow Effects -->
+  <div class="bg-ambient">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+  </div>
+
+  <!-- Mobile Viewport Container / Desktop Mockup Frame -->
+  <main class="mobile-wrapper" id="app-container">
+    <!-- Phone Top Speaker / Notch -->
+    <div class="phone-notch">
+      <div class="speaker"></div>
+      <div class="camera-lens"></div>
+    </div>
+
+    <!-- Confetti Canvas for Victory -->
+    <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+
+    <!-- ==========================================
+         VIEW 1: ENTRY SCREEN
+         ========================================== -->
+    <section id="entry-screen" class="screen-view active">
+      <div class="entry-brand">
+        <div class="badge-tag">
+          <span class="classic-diamond">◆</span>
+          ROUND 3 CHAMPIONSHIP
+          <span class="classic-diamond">◆</span>
+        </div>
+        <h1 class="entry-title">SUDOKU<br><span class="ampersand">&</span> KENKEN</h1>
+        <div class="classic-ornament">
+          <span class="line"></span>
+          <span class="ornament-symbol">❦</span>
+          <span class="line"></span>
+        </div>
+      </div>
+
+      <div class="entry-art-container">
+        <div class="art-card kenken">
+          <img src="assets/kenken_logo.png" alt="KenKen Logo" class="kenken-entry-img">
+          <span class="art-label kenken-text">KENKEN</span>
+        </div>
+        <div class="art-card sudoku">
+          <svg class="classic-sudoku-icon" width="56" height="56" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="44" height="44" rx="4" fill="#ffffff" stroke="#1c1917" stroke-width="2.2"/>
+            <line x1="16.5" y1="2" x2="16.5" y2="46" stroke="#1c1917" stroke-width="1.2"/>
+            <line x1="31.5" y1="2" x2="31.5" y2="46" stroke="#1c1917" stroke-width="1.2"/>
+            <line x1="2" y1="16.5" x2="46" y2="16.5" stroke="#1c1917" stroke-width="1.2"/>
+            <line x1="2" y1="31.5" x2="46" y2="31.5" stroke="#1c1917" stroke-width="1.2"/>
+            <text x="9.5" y="12.5" font-family="'Playfair Display', serif" font-size="8.5" font-weight="700" fill="#1c1917" text-anchor="middle" dominant-baseline="central">5</text>
+            <text x="24" y="12.5" font-family="'Playfair Display', serif" font-size="8.5" font-weight="700" fill="#1c1917" text-anchor="middle" dominant-baseline="central">3</text>
+            <text x="38.5" y="27" font-family="'Playfair Display', serif" font-size="8.5" font-weight="700" fill="#1c1917" text-anchor="middle" dominant-baseline="central">7</text>
+            <text x="9.5" y="41.5" font-family="'Playfair Display', serif" font-size="8.5" font-weight="700" fill="#1c1917" text-anchor="middle" dominant-baseline="central">6</text>
+            <text x="24" y="41.5" font-family="'Playfair Display', serif" font-size="8.5" font-weight="700" fill="#1c1917" text-anchor="middle" dominant-baseline="central">9</text>
+          </svg>
+          <span class="art-label sudoku-text">SUDOKU</span>
+        </div>
+      </div>
+
+      <div class="play-btn-wrapper">
+        <button id="btn-open-play" class="btn-play" onclick="window.ArenaApp?.openPlayModal()">
+          <span class="btn-play-text">PLAY NOW</span>
+        </button>
+        <div class="teams-count-pill" id="entry-teams-pill">
+          Teams Registered: <span id="reg-count-display">0</span> / 8
+        </div>
+      </div>
+
+      <!-- ENTRY BOTTOM BAR: 3 DOTS AT BOTTOM LEFT (PARTIALLY VISIBLE) -->
+      <footer class="entry-footer">
+        <button id="btn-admin-dots" class="admin-three-dots" title="System Settings" onclick="window.ArenaApp?.openAdminModal()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </footer>
+    </section>
+
+    <!-- ==========================================
+         VIEW 2: ROULETTE / SELECTION ANIMATION SCREEN
+         ========================================== -->
+    <section id="roulette-screen" class="screen-view">
+      <div class="roulette-header">
+        <div class="team-alloc-badge" id="roulette-team-display">TEAM: ALPHA</div>
+        <h2 class="roulette-title">SELECTING PUZZLE...</h2>
+      </div>
+
+      <div class="slot-machine-box">
+        <div class="slot-reel" id="slot-reel">
+          <!-- Dynamically populated or animated reel -->
+          <div class="slot-item kenken"><img src="assets/kenken_logo.png" style="width:24px; height:24px; object-fit:contain; border-radius:4px;" alt="KenKen"> KENKEN</div>
+          <div class="slot-item sudoku"><span style="font-family:'Playfair Display',serif; font-weight:bold; font-size:18px;">⊞</span> SUDOKU</div>
+          <div class="slot-item kenken"><img src="assets/kenken_logo.png" style="width:24px; height:24px; object-fit:contain; border-radius:4px;" alt="KenKen"> KENKEN</div>
+          <div class="slot-item sudoku"><span style="font-family:'Playfair Display',serif; font-weight:bold; font-size:18px;">⊞</span> SUDOKU</div>
+        </div>
+      </div>
+
+      <div class="roulette-status" id="roulette-status-text">
+        Drawing paired challenge from archive...
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 3: GAMEPLAY ARENA SCREEN
+         ========================================== -->
+    <section id="game-screen" class="screen-view">
+      <!-- Top status bar -->
+      <header class="game-header">
+        <div class="team-pill">
+          <span class="pulsing-dot"></span>
+          <span id="game-team-name">TEAM ALPHA</span>
+        </div>
+        <div class="game-timer-pill" id="game-timer">
+          ⏱ 00:00
+        </div>
+        <div class="game-type-badge kenken" id="game-type-badge">
+          KENKEN #1
+        </div>
+      </header>
+
+      <div class="sub-header-bar" style="justify-content: center;">
+        <span class="puzzle-title-label" id="puzzle-title-label">4×4 Math Cage Grid</span>
+      </div>
+
+      <!-- Interactive Puzzle Grid Container -->
+      <div class="board-container grid-4x4" id="board-container">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+      <!-- On-Screen Keypad -->
+      <div class="keypad-container" id="keypad-container">
+        <div class="keypad-row" id="keypad-num-row">
+          <!-- Dynamically injected numbers 1-4 (KenKen) or 1-6 (Sudoku) -->
+        </div>
+        <div class="keypad-row">
+          <button type="button" class="keypad-btn action-btn erase" id="btn-key-erase" title="Erase selected cell" onclick="window.ArenaApp?.eraseCell()">
+            ⌫ Clear Cell
+          </button>
+          <button type="button" class="btn-check-solution" id="btn-check-solution" onclick="window.ArenaApp?.checkSolution()">
+            ✓ Check Solution
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 4: ADMIN LIVE OBSERVER SCREEN
+         ========================================== -->
+    <section id="admin-screen" class="screen-view">
+      <header class="admin-header">
+        <div class="admin-title-area">
+          <h2 class="admin-title">ADMINISTRATIVE DESK</h2>
+          <span class="admin-subtitle">Live Tournament Monitor & Answer Controls</span>
+        </div>
+        <div class="admin-controls-top">
+          <button type="button" id="btn-exit-admin" class="btn-admin-exit" onclick="window.ArenaAdmin?.exitAdmin()">← Back</button>
+        </div>
+      </header>
+
+      <!-- 8 Live Team Cards Grid -->
+      <div class="admin-teams-grid" id="admin-teams-container">
+        <!-- 8 Team slots dynamically rendered -->
+      </div>
+
+      <!-- Global Game Reset Bar -->
+      <div class="admin-reset-bar">
+        <button type="button" id="btn-reset-whole-game" class="btn-reset-whole-game" onclick="window.ArenaAdmin?.resetWholeGame()">
+          ⚠️ RESET WHOLE GAME (ALL 8 TEAMS)
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================
+       MODAL 1: TEAM REGISTRATION MODAL
+       ========================================== -->
+  <div class="modal-backdrop" id="modal-register">
+    <div class="modal-card">
+      <button type="button" class="modal-close-btn" id="btn-close-reg" onclick="window.ArenaApp?.closeModal('modal-register')">✕</button>
+      <h3 class="modal-title">Enter Team Name</h3>
+      <p class="modal-desc">Maximum 8 teams are permitted in Round 3. Once enrolled, your puzzle will be randomly selected from 4 KenKen and 4 Sudoku challenges.</p>
+      
+      <form id="form-register">
+        <div class="form-group">
+          <label class="form-label" for="input-team-name">Team Name</label>
+          <input type="text" id="input-team-name" class="form-input" placeholder="e.g. Phoenix, LogicMasters..." maxlength="24" autocomplete="off" required>
+        </div>
+        <button type="submit" class="btn-submit" style="margin-top: 10px;">
+          START CHALLENGE →
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 2: ADMIN AUTH MODAL
+       ========================================== -->
+  <div class="modal-backdrop" id="modal-admin-auth">
+    <div class="modal-card">
+      <button type="button" class="modal-close-btn" id="btn-close-admin-auth" onclick="window.ArenaApp?.closeModal('modal-admin-auth')">✕</button>
+      <h3 class="modal-title">Admin Authorization</h3>
+      <p class="modal-desc">Enter the verified administrative credentials to access live player monitoring.</p>
+      
+      <form id="form-admin-auth">
+        <div class="form-group">
+          <label class="form-label" for="input-admin-id">User ID</label>
+          <input type="text" id="input-admin-id" class="form-input" placeholder="Enter User ID" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-admin-pass">Password</label>
+          <input type="password" id="input-admin-pass" class="form-input" placeholder="Enter Password" required>
+        </div>
+        <div id="admin-auth-error" style="color: var(--red-glow); font-size: 12px; display: none;">
+          Invalid credentials. Access denied.
+        </div>
+        <button type="submit" class="btn-submit" style="margin-top: 6px;">
+          UNLOCK ADMIN PANEL
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 4: VICTORY / COMPLETION CELEBRATION
+       ========================================== -->
+  <div class="modal-backdrop" id="modal-victory">
+    <div class="modal-card celebrate-card">
+      <div class="trophy-glow">🏆</div>
+      <h3 class="modal-title" style="color: var(--ink-primary); font-family: var(--font-title); font-size: 24px;">CHALLENGE COMPLETED</h3>
+      <p class="modal-desc" id="victory-message">Exemplary deduction! Your solution has been verified.</p>
+      <div style="font-family: var(--font-mono); font-size: 20px; color: var(--amber-glow); font-weight: bold;" id="victory-time-display">
+        Time: 00:00
+      </div>
+      <button class="btn-submit" id="btn-victory-close" style="margin-top: 14px;" onclick="window.ArenaApp?.closeModal('modal-victory')">
+        GREAT JOB!
+      </button>
+    </div>
+  </div>
+
+  <!-- Logic Scripts -->
+  <script type="module" src="js/puzzles.js"></script>
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/admin.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
